@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Credential {
+  id             Int    @id @default(autoincrement())
+  userId         Int
+  credentialName String
+  username       String
+  password       String
+  url            String
+  User           User   @relation(fields: [userId], references: [id])
+
+  @@unique([userId, credentialName])
+  @@map("credentials")
+}
+
+model CreditCard {
+  id             Int            @id @default(autoincrement())
+  numberCard     String
+  nameUserCard   String
+  cvv            Int
+  expirationDate DateTime
+  cardPassword   Int
+  isVirtual      Boolean
+  type           CreditCardType
+  userId         Int
+  User           User           @relation(fields: [userId], references: [id])
+
+  @@unique([userId, numberCard])
+  @@map("creditCards")
+}
+
+model SecurityNote {
+  id       Int    @id @default(autoincrement())
+  userId   Int
+  noteName String
+  note     String
+  User     User   @relation(fields: [userId], references: [id])
+
+  @@unique([userId, noteName])
+  @@map("securityNotes")
+}
+
+model Session {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  token     String
+  createdAt DateTime @default(now())
+  User      User     @relation(fields: [userId], references: [id])
+
+  @@map("sessions")
+}
+
+model User {
+  id           Int            @id @default(autoincrement())
+  email        String         @unique
+  password     String
+  Credential   Credential[]
+  CreditCard   CreditCard[]
+  SecurityNote SecurityNote[]
+  Session      Session[]
+
+  @@map("users")
+}
+
+enum CreditCardType {
+  CREDIT
+  DEBIT
+  CREDITDEBIT
+}
