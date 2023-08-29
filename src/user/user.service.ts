@@ -4,7 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRepository } from './user.repository';
 import * as bcrypt from "bcrypt"
 import { UserLoginDto } from './dto/user-login.dto';
-import { JwtService } from '@nestjs/jwt';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class UserService {
@@ -13,7 +13,7 @@ export class UserService {
 
   constructor(
     private readonly repository: UserRepository,
-    private readonly JwtSercive: JwtService
+    private readonly authService: AuthService
   ) { }
 
   async create(createUserDto: CreateUserDto) {
@@ -32,7 +32,7 @@ export class UserService {
     if (!login) throw new HttpException('Incorrect email', HttpStatus.UNAUTHORIZED)
 
     this.comparePassword(password, login.password)
-    const token = this.JwtSercive.sign(login)
+    const token = await this.authService.generateToken(login)
 
     return await this.repository.createSession(token, login.id)
   }
