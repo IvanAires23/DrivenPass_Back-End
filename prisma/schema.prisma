@@ -8,15 +8,15 @@ datasource db {
 }
 
 model Credential {
-  id             Int    @id @default(autoincrement())
-  userId         Int
-  credentialName String
-  username       String
-  password       String
-  url            String
-  User           User   @relation(fields: [userId], references: [id])
+  id       Int    @id @default(autoincrement())
+  userId   Int
+  title    String
+  username String
+  password String
+  url      String
+  User     User   @relation(fields: [userId], references: [id])
 
-  @@unique([userId, credentialName])
+  @@unique([userId, title])
   @@map("credentials")
 }
 
