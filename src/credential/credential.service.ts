@@ -46,6 +46,6 @@ export class CredentialService {
 
   async remove(id: number, userId: number) {
     await this.findOne(id, userId)
-    return this.repository.delete(id)
+    return await this.repository.delete(id)
   }
 }

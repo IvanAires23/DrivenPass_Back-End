@@ -21,8 +21,7 @@ export class AuthGuard implements CanActivate {
             request.user = user //colocando usuario quando do requant
             return true
         } catch (err) {
-            console.log(err)
-            throw new UnauthorizedException('ttt')
+            throw new UnauthorizedException()
         }
     }
 

@@ -21,30 +21,31 @@ model Credential {
 }
 
 model CreditCard {
-  id             Int            @id @default(autoincrement())
+  id             Int      @id @default(autoincrement())
+  title          String
   numberCard     String
-  nameUserCard   String
-  cvv            Int
+  nameOnCard     String
+  cvv            String
   expirationDate DateTime
-  cardPassword   Int
+  cardPassword   String
   isVirtual      Boolean
-  type           CreditCardType
+  type           String
   userId         Int
-  User           User           @relation(fields: [userId], references: [id])
+  User           User     @relation(fields: [userId], references: [id])
 
-  @@unique([userId, numberCard])
+  @@unique([userId, title])
   @@map("creditCards")
 }
 
-model SecurityNote {
-  id       Int    @id @default(autoincrement())
-  userId   Int
-  noteName String
-  note     String
-  User     User   @relation(fields: [userId], references: [id])
+model Note {
+  id     Int    @id @default(autoincrement())
+  userId Int
+  title  String
+  note   String
+  User   User   @relation(fields: [userId], references: [id])
 
-  @@unique([userId, noteName])
-  @@map("securityNotes")
+  @@unique([userId, title])
+  @@map("notes")
 }
 
 model Session {
@@ -58,19 +59,13 @@ model Session {
 }
 
 model User {
-  id           Int            @id @default(autoincrement())
-  email        String         @unique
+  id           Int          @id @default(autoincrement())
+  email        String       @unique
   password     String
   Credential   Credential[]
   CreditCard   CreditCard[]
-  SecurityNote SecurityNote[]
+  SecurityNote Note[]
   Session      Session[]
 
   @@map("users")
-}
-
-enum CreditCardType {
-  CREDIT
-  DEBIT
-  CREDITDEBIT
 }

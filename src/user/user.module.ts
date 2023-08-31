@@ -1,7 +1,8 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserRepository } from './user.repository';
 
+@Global()
 @Module({
   providers: [UserService, UserRepository],
   exports: [UserService]
