@@ -19,15 +19,6 @@ export class UserRepository {
         })
     }
 
-    createSession(token: string, id: number) {
-        return this.prisma.session.create({
-            data: {
-                token,
-                userId: id
-            }
-        })
-    }
-
     findEmail(email: string) {
         return this.prisma.user.findFirst({
             where: { email }
