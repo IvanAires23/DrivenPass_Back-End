@@ -7,7 +7,6 @@ export class E2EUtils {
         await prisma.credential.deleteMany()
         await prisma.creditCard.deleteMany()
         await prisma.note.deleteMany()
-        await prisma.session.deleteMany()
         await prisma.user.deleteMany()
     }
 

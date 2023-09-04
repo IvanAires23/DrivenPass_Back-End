@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
 import { EraseService } from './erase.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { EraseDto } from './dto/erase.dto';
@@ -12,6 +12,7 @@ export class EraseController {
 
     @Post()
     @UseGuards(AuthGuard)
+    @HttpCode(HttpStatus.OK)
     erase(@Body() body: EraseDto, @User() user: UserPrisma) {
         return this.eraseService.deleteUser(body, user.id)
     }

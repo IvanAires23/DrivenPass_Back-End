@@ -177,6 +177,18 @@ describe('token is valid', () => {
         expect(response.status).toBe(HttpStatus.OK)
         expect(response.body).toHaveLength(1)
     });
+
+    it('should return 200 to get card for id', async () => {
+        const user = await new UserFactory(prisma).persist()
+        const token = await E2EUtils.generateValidToken(jwt, user.id)
+        const card = await new CardsFactory(prisma, user.id).persist()
+
+        const response = await request(app.getHttpServer())
+            .get(`/cards/${card.id}`)
+            .set('Authorization', `Bearer ${token}`)
+
+        expect(response.status).toBe(HttpStatus.OK)
+    });
 });
 
 describe('DELETE /cards', () => {

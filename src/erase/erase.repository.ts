@@ -6,12 +6,12 @@ export class EraseRepository {
 
     constructor(private readonly prisma: PrismaService) { }
 
-    deleteUser(userId: number) {
-        this.prisma.credential.deleteMany({ where: { userId } })
-        this.prisma.note.deleteMany({ where: { userId } })
-        this.prisma.creditCard.deleteMany({ where: { userId } })
-        this.prisma.session.deleteMany({ where: { userId } })
-        return this.prisma.user.delete({ where: { id: userId } })
+    async deleteUser(userId: number) {
+        await this.prisma.credential.deleteMany()
+        await this.prisma.creditCard.deleteMany()
+        await this.prisma.note.deleteMany()
+        await this.prisma.user.deleteMany({ where: { id: userId } })
+        return 'User delete'
     }
 
 

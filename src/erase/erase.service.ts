@@ -16,7 +16,7 @@ export class EraseService {
         const user = await this.userService.findUserById(userId)
         if (!user) throw new NotFoundException('Not Found User')
 
-        const compare = bcrypt.compare(body.password, user.password)
+        const compare = bcrypt.compareSync(body.password, user.password)
         if (!compare) throw new UnauthorizedException('Incorret password')
 
         return await this.repository.deleteUser(userId)
