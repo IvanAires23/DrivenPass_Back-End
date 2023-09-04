@@ -6,7 +6,7 @@ export class CryptrService {
     private readonly cryptr: Cryptr;
 
     constructor() {
-        this.cryptr = new Cryptr('chave-secreta-aqui');
+        this.cryptr = new Cryptr(process.env.PASSWORD_CRYPTR);
     }
 
     encrypt(data: string): string {

@@ -1,5 +1,6 @@
 import * as bcrypt from 'bcrypt'
 import { PrismaService } from "../../src/prisma/prisma.service";
+import { faker } from '@faker-js/faker';
 
 export class UserFactory {
 
@@ -27,11 +28,10 @@ export class UserFactory {
     }
 
     persist() {
-        const user = this.build()
         return this.prisma.user.create({
             data: {
-                email: this.email,
-                password: bcrypt.hashSync(this.password, 10)
+                email: this.email ? this.email : faker.internet.email(),
+                password: bcrypt.hashSync('Str0ngP@ssw0rd', 10)
             }
         })
     }
