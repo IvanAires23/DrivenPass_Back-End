@@ -10,7 +10,7 @@ import { E2EUtils } from "./utils/e2e-utils";
 import request from 'supertest'
 import { UserFactory } from "./fatories/users.fatory";
 import { faker } from "@faker-js/faker";
-import { NotesFactory } from "./fatories/notes.factory";
+import { CardsFactory } from "./fatories/creditCard.factory";
 
 let app: INestApplication;
 let prisma: PrismaService = new PrismaService()
@@ -37,9 +37,9 @@ afterAll(async () => {
     await prisma.$disconnect();
 });
 
-describe('POST /notes', () => {
+describe('POST /cards', () => {
     it('should return 401 when not sending token', async () => {
-        const response = await request(app.getHttpServer()).post('/notes')
+        const response = await request(app.getHttpServer()).post('/cards')
 
         expect(response.status).toBe(HttpStatus.UNAUTHORIZED)
     });
@@ -49,7 +49,7 @@ describe('POST /notes', () => {
         const token = faker.word.words()
 
         const response = await request(app.getHttpServer())
-            .post('/notes')
+            .post('/cards')
             .set('Authorization', `Bearer ${token}`)
 
         expect(response.status).toBe(HttpStatus.UNAUTHORIZED)
@@ -64,15 +64,30 @@ describe('token is valid', () => {
         const token = await E2EUtils.generateValidToken(jwt, user.id)
 
         const response = await request(app.getHttpServer())
-            .post('/notes')
+            .post('/cards')
             .set('Authorization', `Bearer ${token}`)
 
         expect(response.status).toBe(HttpStatus.BAD_REQUEST)
         expect(response.body.message).toEqual([
             "title should not be empty",
             "title must be a string",
-            "note should not be empty",
-            "note must be a string"
+            "cardNumber must be longer than or equal to 4 characters",
+            "cardNumber should not be empty",
+            "cardNumber must be a string",
+            "nameOnCard should not be empty",
+            "nameOnCard must be a string",
+            "cvv must be longer than or equal to 3 characters",
+            "cvv should not be empty",
+            "cvv must be a string",
+            "dateExpiration must be a valid ISO 8601 date string",
+            "dateExpiration should not be empty",
+            "dateExpiration must be a string",
+            "password should not be empty",
+            "password must be a string",
+            "isVirtual should not be empty",
+            "isVirtual must be a boolean value",
+            "type should not be empty",
+            "type must be a string"
         ])
     });
 
@@ -80,40 +95,33 @@ describe('token is valid', () => {
         const title = faker.word.words()
         const user = await new UserFactory(prisma).persist()
         const token = await E2EUtils.generateValidToken(jwt, user.id)
-        await new NotesFactory(prisma, user.id).withTitle(title).persist()
-        const note = new NotesFactory(prisma, user.id).withTitle(title).build()
-
+        await new CardsFactory(prisma, user.id).withTitle(title).persist()
+        const card = new CardsFactory(prisma, user.id).withTitle(title).build()
         const response = await request(app.getHttpServer())
-            .post('/notes')
+            .post('/cards')
             .set('Authorization', `Bearer ${token}`)
-            .send(note)
+            .send(card)
 
         expect(response.status).toBe(HttpStatus.CONFLICT)
     });
 
-    it('should return 201 when create note', async () => {
+    it('should return 201 when create card', async () => {
         const user = await new UserFactory(prisma).persist()
         const token = await E2EUtils.generateValidToken(jwt, user.id)
-        const note = new NotesFactory(prisma, user.id).build()
+        const card = new CardsFactory(prisma, user.id).build()
 
         const response = await request(app.getHttpServer())
-            .post('/notes')
+            .post('/cards')
             .set('Authorization', `Bearer ${token}`)
-            .send(note)
+            .send(card)
 
         expect(response.status).toBe(HttpStatus.CREATED)
-        expect(response.body).toEqual({
-            id: expect.any(Number),
-            title: note.title,
-            note: note.note,
-            userId: expect.any(Number)
-        })
     })
 })
 
-describe('GET /notes', () => {
+describe('GET /cards', () => {
     it('should return 401 when not sending token', async () => {
-        const response = await request(app.getHttpServer()).get('/notes')
+        const response = await request(app.getHttpServer()).get('/cards')
 
         expect(response.status).toBe(HttpStatus.UNAUTHORIZED)
     });
@@ -123,7 +131,7 @@ describe('GET /notes', () => {
         const token = faker.word.words()
 
         const response = await request(app.getHttpServer())
-            .get('/notes')
+            .get('/cards')
             .set('Authorization', `Bearer ${token}`)
 
         expect(response.status).toBe(HttpStatus.UNAUTHORIZED)
@@ -131,39 +139,39 @@ describe('GET /notes', () => {
 })
 
 describe('token is valid', () => {
-    it('should return 403 when notes is not the user', async () => {
+    it('should return 403 when credit card is not the user', async () => {
         const user = await new UserFactory(prisma).persist()
         const newUser = await new UserFactory(prisma).persist()
         const token = await E2EUtils.generateValidToken(jwt, user.id)
-        const note = await new NotesFactory(prisma, newUser.id).persist()
+        const card = await new CardsFactory(prisma, newUser.id).persist()
 
         const response = await request(app.getHttpServer())
-            .get(`/notes/${note.id}`)
+            .get(`/cards/${card.id}`)
             .set('Authorization', `Bearer ${token}`)
 
         expect(response.status).toBe(HttpStatus.FORBIDDEN)
 
     });
 
-    it('should return 404 when not finding notes', async () => {
+    it('should return 404 when not finding credit card', async () => {
         const user = await new UserFactory(prisma).persist()
         const token = await E2EUtils.generateValidToken(jwt, user.id)
-        await new NotesFactory(prisma, user.id).persist()
+        await new CardsFactory(prisma, user.id).persist()
 
         const response = await request(app.getHttpServer())
-            .get(`/notes/1`)
+            .get(`/cards/1`)
             .set('Authorization', `Bearer ${token}`)
 
         expect(response.status).toBe(HttpStatus.NOT_FOUND)
     });
 
-    it('should return 200 to get notes', async () => {
+    it('should return 200 to get cards', async () => {
         const user = await new UserFactory(prisma).persist()
         const token = await E2EUtils.generateValidToken(jwt, user.id)
-        await new NotesFactory(prisma, user.id).persist()
+        await new CardsFactory(prisma, user.id).persist()
 
         const response = await request(app.getHttpServer())
-            .get('/notes')
+            .get('/cards')
             .set('Authorization', `Bearer ${token}`)
 
         expect(response.status).toBe(HttpStatus.OK)
@@ -171,9 +179,9 @@ describe('token is valid', () => {
     });
 });
 
-describe('DELETE /notes', () => {
+describe('DELETE /cards', () => {
     it('should return 401 when not sending token', async () => {
-        const response = await request(app.getHttpServer()).delete('/notes/1')
+        const response = await request(app.getHttpServer()).delete('/cards/1')
 
         expect(response.status).toBe(HttpStatus.UNAUTHORIZED)
     });
@@ -183,7 +191,7 @@ describe('DELETE /notes', () => {
         const token = faker.word.words()
 
         const response = await request(app.getHttpServer())
-            .delete('/notes/1')
+            .delete('/cards/1')
             .set('Authorization', `Bearer ${token}`)
 
         expect(response.status).toBe(HttpStatus.UNAUTHORIZED)
@@ -193,40 +201,40 @@ describe('DELETE /notes', () => {
 
 describe('token is valid', () => {
 
-    it('should return 403 when notes is not the user', async () => {
+    it('should return 403 when credit card is not the user', async () => {
         const user = await new UserFactory(prisma).persist()
         const newUser = await new UserFactory(prisma).persist()
         const token = await E2EUtils.generateValidToken(jwt, user.id)
-        const note = await new NotesFactory(prisma, newUser.id).persist()
+        const card = await new CardsFactory(prisma, newUser.id).persist()
 
         const response = await request(app.getHttpServer())
-            .delete(`/notes/${note.id}`)
+            .delete(`/cards/${card.id}`)
             .set('Authorization', `Bearer ${token}`)
 
         expect(response.status).toBe(HttpStatus.FORBIDDEN)
 
     });
 
-    it('should return 404 when not finding notes', async () => {
+    it('should return 404 when not finding credit card', async () => {
         const user = await new UserFactory(prisma).persist()
         const token = await E2EUtils.generateValidToken(jwt, user.id)
-        await new NotesFactory(prisma, user.id).persist()
+        await new CardsFactory(prisma, user.id).persist()
 
         const response = await request(app.getHttpServer())
-            .delete(`/notes/1`)
+            .delete(`/cards/1`)
             .set('Authorization', `Bearer ${token}`)
 
         expect(response.status).toBe(HttpStatus.NOT_FOUND)
     });
 
-    it('should return 200 to delete note', async () => {
+    it('should return 200 to delete card', async () => {
         const user = await new UserFactory(prisma).persist()
         const token = await E2EUtils.generateValidToken(jwt, user.id)
 
-        const note = await new NotesFactory(prisma, user.id).persist()
+        const card = await new CardsFactory(prisma, user.id).persist()
 
         const response = await request(app.getHttpServer())
-            .delete(`/notes/${note.id}`)
+            .delete(`/cards/${card.id}`)
             .set('Authorization', `Bearer ${token}`)
 
         expect(response.status).toBe(HttpStatus.OK)

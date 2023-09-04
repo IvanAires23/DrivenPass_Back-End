@@ -1,4 +1,4 @@
-import { ConflictException, ForbiddenException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
 import { CardsRepository } from './cards.repository';
@@ -14,6 +14,7 @@ export class CardsService {
 
   async create(body: CreateCardDto, userId: number) {
     const { title, cvv, cardNumber, dateExpiration, isVirtual, nameOnCard, password, type } = body
+    this.isNumber(cardNumber)
     const cardNameAndUser = await this.repository.findByTitleAndUser(title, userId)
     if (cardNameAndUser) throw new ConflictException('Title already in use')
     if (type !== "CREDIT" && type !== "DEBIT" && type !== "CREDITDEBIT") {
@@ -50,5 +51,10 @@ export class CardsService {
   async remove(id: number, userId: number) {
     await this.findOne(id, userId)
     return await this.repository.delete(id)
+  }
+
+  private isNumber(cardNumber: string) {
+    const number = parseInt(cardNumber)
+    if (isNaN(number)) throw new BadRequestException()
   }
 }
