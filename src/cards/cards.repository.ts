@@ -1,22 +1,16 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
+import { CreateCardDto } from "./dto/create-card.dto";
 
 @Injectable()
 export class CardsRepository {
 
     constructor(private readonly prisma: PrismaService) { }
 
-    createCreditCard(title: string, cryptCvv: string, cryptPassword: string, numberCard: string, expirationDate: string, isVirtual: boolean, nameOnCard: string, type: string, userId: number) {
+    createCreditCard(createCardDto: CreateCardDto, userId: number) {
         return this.prisma.creditCard.create({
             data: {
-                cardPassword: cryptPassword,
-                cvv: cryptCvv,
-                expirationDate,
-                isVirtual,
-                nameOnCard,
-                numberCard,
-                title,
-                type,
+                ...createCardDto,
                 userId
             }
         })

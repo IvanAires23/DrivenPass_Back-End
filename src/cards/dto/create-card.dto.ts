@@ -18,7 +18,7 @@ export class CreateCardDto {
         example: '1234',
         description: '4 last number of card'
     })
-    cardNumber: string;
+    number: string;
 
     @IsString()
     @IsNotEmpty()
@@ -42,7 +42,7 @@ export class CreateCardDto {
     @ApiProperty({
         example: '2022-11-19T05:52:49.100Z'
     })
-    dateExpiration: string;
+    expirationDate: string;
 
     @IsString()
     @IsNotEmpty()

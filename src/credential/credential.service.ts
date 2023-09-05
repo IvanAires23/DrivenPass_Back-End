@@ -4,7 +4,7 @@ import { UpdateCredentialDto } from './dto/update-credential.dto';
 import { CredentialRepository } from './crendential.repository';
 import { User } from '@prisma/client';
 import Cryptr from 'cryptr';
-import { CryptrService } from '../cryptr/cryptr.service';
+import { CryptrService } from '../crypto/cryptr.service';
 
 @Injectable()
 export class CredentialService {

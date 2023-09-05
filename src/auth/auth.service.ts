@@ -3,14 +3,15 @@ import { JwtService } from '@nestjs/jwt';
 import { SignUpDto } from './dto/signUp.dto';
 import { UserService } from '../user/user.service';
 import { SignInDto } from './dto/signIn.dtp';
-import * as bcrypt from 'bcrypt'
+import { BcryptService } from '../crypto/bcrypt.service';
 
 @Injectable()
 export class AuthService {
 
     constructor(
         private readonly jwtService: JwtService,
-        private readonly userService: UserService
+        private readonly userService: UserService,
+        private readonly bcrypt: BcryptService
     ) { }
 
     async signUp(body: SignUpDto) {
@@ -22,7 +23,7 @@ export class AuthService {
         const user = await this.userService.findEmail(email)
         if (!user) throw new UnauthorizedException("Incorret email")
 
-        const compare = await bcrypt.compare(password, user.password)
+        const compare = this.bcrypt.compare(password, user.password)
         if (!compare) throw new UnauthorizedException("Password incorret")
 
         return this.generateToken(user.id)

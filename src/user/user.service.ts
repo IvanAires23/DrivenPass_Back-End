@@ -1,12 +1,14 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserRepository } from './user.repository';
+import { BcryptService } from '../crypto/bcrypt.service';
 
 @Injectable()
 export class UserService {
 
   constructor(
     private readonly repository: UserRepository,
+    private readonly bcrypt: BcryptService
   ) { }
 
   async create(createUserDto: CreateUserDto) {

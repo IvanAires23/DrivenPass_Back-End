@@ -23,11 +23,11 @@ model Credential {
 model CreditCard {
   id             Int      @id @default(autoincrement())
   title          String
-  numberCard     String
+  number         String
   nameOnCard     String
   cvv            String
   expirationDate DateTime
-  cardPassword   String
+  password       String
   isVirtual      Boolean
   type           String
   userId         Int

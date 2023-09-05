@@ -2,7 +2,7 @@ import { BadRequestException, ConflictException, ForbiddenException, Injectable,
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
 import { CardsRepository } from './cards.repository';
-import { CryptrService } from '../cryptr/cryptr.service';
+import { CryptrService } from '../crypto/cryptr.service';
 
 @Injectable()
 export class CardsService {
@@ -13,8 +13,8 @@ export class CardsService {
   ) { }
 
   async create(body: CreateCardDto, userId: number) {
-    const { title, cvv, cardNumber, dateExpiration, isVirtual, nameOnCard, password, type } = body
-    this.isNumber(cardNumber)
+    const { title, cvv, number, password, type } = body
+    this.isNumber(number)
     const cardNameAndUser = await this.repository.findByTitleAndUser(title, userId)
     if (cardNameAndUser) throw new ConflictException('Title already in use')
     if (type !== "CREDIT" && type !== "DEBIT" && type !== "CREDITDEBIT") {
@@ -24,16 +24,8 @@ export class CardsService {
     const cryptCvv = this.cryptrService.encrypt(cvv)
     const cryptPassword = this.cryptrService.encrypt(password)
 
-    return await this.repository.createCreditCard(
-      title,
-      cryptCvv,
-      cryptPassword,
-      cardNumber,
-      dateExpiration,
-      isVirtual,
-      nameOnCard,
-      type,
-      userId)
+
+    return await this.repository.createCreditCard({ ...body, password: cryptPassword, cvv: cryptCvv }, userId)
   }
 
   async findAll(userId: number) {
