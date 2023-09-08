@@ -63,10 +63,10 @@ export class CardsFactory {
     build() {
         return {
             title: this.title || faker.word.words(),
-            cardNumber: this.cardNumber || this.randomCreditCard,
+            number: this.cardNumber || this.randomCreditCard,
             nameOnCard: this.nameInCard || faker.person.firstName(),
             cvv: this.cvv || this.randomCvv,
-            dateExpiration: this.dateOfExpiration || faker.date.future(),
+            expirationDate: this.dateOfExpiration || faker.date.future(),
             password: this.password || this.cryptr.encrypt(this.randomCreditCard),
             isVirtual: this.isVirtual || faker.datatype.boolean(),
             type: this.type || "CREDIT"
@@ -77,11 +77,11 @@ export class CardsFactory {
         return this.prisma.creditCard.create({
             data: {
                 title: this.title || faker.word.words(),
-                numberCard: this.cardNumber || this.randomCreditCard,
+                number: this.cardNumber || this.randomCreditCard,
                 nameOnCard: this.nameInCard || faker.person.firstName(),
                 cvv: this.cvv || this.randomCvv,
                 expirationDate: this.dateOfExpiration || faker.date.future(),
-                cardPassword: this.password || this.cryptr.encrypt(this.randomCreditCard),
+                password: this.password || this.cryptr.encrypt(this.randomCreditCard),
                 isVirtual: this.isVirtual || faker.datatype.boolean(),
                 type: this.type || "CREDIT",
                 userId: this.userId

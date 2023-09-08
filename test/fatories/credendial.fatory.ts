@@ -1,16 +1,17 @@
 import { faker } from "@faker-js/faker";
 import { PrismaService } from "../../src/prisma/prisma.service";
 import Cryptr from "cryptr";
+import { CryptrService } from "../../src/crypto/cryptr.service";
 
 export class CredentialFactory {
     private url: string;
     private username: string;
     private password: string;
     private title: string
-    private readonly cryptr: Cryptr
 
-    constructor(private readonly prisma: PrismaService, private readonly userId: number) {
-        this.cryptr = new Cryptr(process.env.PASSWORD_CRYPTR);
+    constructor(private readonly prisma: PrismaService,
+        private readonly userId: number,
+        private readonly crytpo: CryptrService) {
     }
 
     withUrl(url: string) {
@@ -45,10 +46,10 @@ export class CredentialFactory {
     persist() {
         return this.prisma.credential.create({
             data: {
-                url: this.url ? this.url : faker.internet.url(),
-                username: this.username ? this.username : faker.person.firstName(),
-                password: this.cryptr.encrypt('Str0ngP@ssw0rd'),
-                title: this.title ? this.title : faker.word.words(),
+                url: this.url || faker.internet.url(),
+                username: this.username || faker.person.firstName(),
+                password: this.crytpo.encrypt('Str0ngP@ssw0rd'),
+                title: this.title || faker.word.words(),
                 userId: this.userId
             }
         })

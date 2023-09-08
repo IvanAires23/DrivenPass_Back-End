@@ -11,15 +11,17 @@ import { UserService } from "../src/user/user.service";
 import { UserRepository } from "../src/user/user.repository";
 import { CredentialFactory } from "./fatories/credendial.fatory";
 import { faker } from "@faker-js/faker";
+import { CryptrService } from "../src/crypto/cryptr.service";
 
 let app: INestApplication;
 let prisma: PrismaService = new PrismaService()
 let jwt: JwtService = new JwtService({ secret: process.env.JWT_SECRET })
+let crypto: CryptrService = new CryptrService()
 
 beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
         imports: [AppModule],
-        providers: [AuthService, UserService, JwtService, UserRepository],
+        providers: [AuthService, UserService, JwtService, UserRepository, CryptrService],
     })
         .overrideProvider(PrismaService)
         .useValue(prisma)
@@ -61,11 +63,11 @@ describe('token is valid', () => {
     it('it should return 409 when the credential already exists', async () => {
         const user = await new UserFactory(prisma).persist()
         const token = await E2EUtils.generateValidToken(jwt, user.id)
-        await new CredentialFactory(prisma, user.id)
+        await new CredentialFactory(prisma, user.id, crypto)
             .withTitle('test')
             .persist()
 
-        const credential = new CredentialFactory(prisma, user.id)
+        const credential = new CredentialFactory(prisma, user.id, crypto)
             .withPassword('5tr0ngP@ssW0rd')
             .withTitle('test')
             .withUrl(faker.internet.url())
@@ -87,7 +89,7 @@ describe('token is valid', () => {
             .persist()
         const token = await E2EUtils.generateValidToken(jwt, user.id)
 
-        const credential = new CredentialFactory(prisma, user.id)
+        const credential = new CredentialFactory(prisma, user.id, crypto)
             .withUrl(faker.internet.url())
             .withUsername(faker.person.firstName())
             .withPassword("Str0ngP@ssw0rd")
@@ -127,7 +129,7 @@ describe('token is valid', () => {
         const user = await new UserFactory(prisma).persist()
         const newUser = await new UserFactory(prisma).persist()
         const token = await E2EUtils.generateValidToken(jwt, user.id)
-        const credendial = await new CredentialFactory(prisma, newUser.id).persist()
+        const credendial = await new CredentialFactory(prisma, newUser.id, crypto).persist()
 
         const response = await request(app.getHttpServer())
             .get(`/credentials/${credendial.id}`)
@@ -140,7 +142,7 @@ describe('token is valid', () => {
     it('should return 404 when not finding credential', async () => {
         const user = await new UserFactory(prisma).persist()
         const token = await E2EUtils.generateValidToken(jwt, user.id)
-        await new CredentialFactory(prisma, user.id).persist()
+        await new CredentialFactory(prisma, user.id, crypto).persist()
 
         const response = await request(app.getHttpServer())
             .get(`/credentials/1`)
@@ -152,7 +154,7 @@ describe('token is valid', () => {
     it('should return 200 to get credentials', async () => {
         const user = await new UserFactory(prisma).persist()
         const token = await E2EUtils.generateValidToken(jwt, user.id)
-        await new CredentialFactory(prisma, user.id).persist()
+        await new CredentialFactory(prisma, user.id, crypto).persist()
 
         const response = await request(app.getHttpServer())
             .get('/credentials')
@@ -160,19 +162,6 @@ describe('token is valid', () => {
 
         expect(response.status).toBe(HttpStatus.OK)
         expect(response.body).toHaveLength(1)
-    });
-
-    it('should return 200 to delete credential', async () => {
-        const user = await new UserFactory(prisma).persist()
-        const token = await E2EUtils.generateValidToken(jwt, user.id)
-
-        const credendial = await new CredentialFactory(prisma, user.id).persist()
-
-        const response = await request(app.getHttpServer())
-            .delete(`/credentials/${credendial.id}`)
-            .set('Authorization', `Bearer ${token}`)
-
-        expect(response.status).toBe(HttpStatus.OK)
     });
 })
 
@@ -199,7 +188,7 @@ describe('token is valid', () => {
     it('should return 404 if delete credential not exist', async () => {
         const user = await new UserFactory(prisma).persist()
         const token = await E2EUtils.generateValidToken(jwt, user.id)
-        await new CredentialFactory(prisma, user.id).persist()
+        await new CredentialFactory(prisma, user.id, crypto).persist()
 
         const response = await request(app.getHttpServer())
             .delete(`/credentials/1`)
@@ -212,12 +201,25 @@ describe('token is valid', () => {
         const user = await new UserFactory(prisma).persist()
         const newUser = await new UserFactory(prisma).persist()
         const token = await E2EUtils.generateValidToken(jwt, user.id)
-        const credendial = await new CredentialFactory(prisma, newUser.id).persist()
+        const credendial = await new CredentialFactory(prisma, newUser.id, crypto).persist()
 
         const response = await request(app.getHttpServer())
             .delete(`/credentials/${credendial.id}`)
             .set('Authorization', `Bearer ${token}`)
 
         expect(response.status).toBe(HttpStatus.FORBIDDEN)
+    });
+
+    it('should return 200 to delete credential', async () => {
+        const user = await new UserFactory(prisma).persist()
+        const token = await E2EUtils.generateValidToken(jwt, user.id)
+
+        const credendial = await new CredentialFactory(prisma, user.id, crypto).persist()
+
+        const response = await request(app.getHttpServer())
+            .delete(`/credentials/${credendial.id}`)
+            .set('Authorization', `Bearer ${token}`)
+
+        expect(response.status).toBe(HttpStatus.OK)
     });
 })
