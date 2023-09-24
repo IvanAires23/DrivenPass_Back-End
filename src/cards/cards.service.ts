@@ -1,6 +1,5 @@
 import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { CreateCardDto } from './dto/create-card.dto';
-import { UpdateCardDto } from './dto/update-card.dto';
 import { CardsRepository } from './cards.repository';
 import { CryptrService } from '../crypto/cryptr.service';
 
@@ -23,9 +22,9 @@ export class CardsService {
 
     const cryptCvv = this.cryptrService.encrypt(cvv)
     const cryptPassword = this.cryptrService.encrypt(password)
-
-
-    return await this.repository.createCreditCard({ ...body, password: cryptPassword, cvv: cryptCvv }, userId)
+    const dataCreditCard = { ...body, password: cryptPassword, cvv: cryptCvv }
+    console.log(dataCreditCard.cvv)
+    return await this.repository.createCreditCard(dataCreditCard, userId)
   }
 
   async findAll(userId: number) {
