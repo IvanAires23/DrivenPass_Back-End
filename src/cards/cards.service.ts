@@ -12,7 +12,7 @@ export class CardsService {
   ) { }
 
   async create(body: CreateCardDto, userId: number) {
-    const { title, cvv, number, password, type } = body
+    const { title, cvv, number, password, type, expirationDate, isVirtual, nameOnCard } = body
     this.isNumber(number)
     const cardNameAndUser = await this.repository.findByTitleAndUser(title, userId)
     if (cardNameAndUser) throw new ConflictException('Title already in use')
@@ -22,9 +22,17 @@ export class CardsService {
 
     const cryptCvv = this.cryptrService.encrypt(cvv)
     const cryptPassword = this.cryptrService.encrypt(password)
-    const dataCreditCard = { ...body, password: cryptPassword, cvv: cryptCvv }
-    console.log(dataCreditCard.cvv)
-    return await this.repository.createCreditCard(dataCreditCard, userId)
+    const creditCardData = {
+      title,
+      cvv: cryptCvv,
+      password: cryptPassword,
+      number,
+      expirationDate,
+      isVirtual,
+      nameOnCard,
+      type,
+    }
+    return await this.repository.createCreditCard(creditCardData, userId)
   }
 
   async findAll(userId: number) {
