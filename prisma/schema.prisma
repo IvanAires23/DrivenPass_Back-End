@@ -21,17 +21,17 @@ model Credential {
 }
 
 model CreditCard {
-  id             Int      @id @default(autoincrement())
+  id             Int     @id @default(autoincrement())
   title          String
   number         String
   nameOnCard     String
   cvv            String
-  expirationDate DateTime
+  expirationDate String
   password       String
   isVirtual      Boolean
   type           String
   userId         Int
-  User           User     @relation(fields: [userId], references: [id])
+  User           User    @relation(fields: [userId], references: [id])
 
   @@unique([userId, title])
   @@map("creditCards")
