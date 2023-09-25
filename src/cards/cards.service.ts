@@ -22,16 +22,17 @@ export class CardsService {
 
     const cryptCvv = this.cryptrService.encrypt(cvv)
     const cryptPassword = this.cryptrService.encrypt(password)
-
-    return await this.repository.createCreditCard(title,
-      cryptCvv,
-      cryptPassword,
+    const creditCardData = {
+      title,
+      cvv: cryptCvv,
+      password: cryptPassword,
       number,
       expirationDate,
       isVirtual,
       nameOnCard,
       type,
-      userId)
+    }
+    return await this.repository.createCreditCard(creditCardData, userId)
   }
 
   async findAll(userId: number) {

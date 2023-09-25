@@ -7,20 +7,15 @@ export class CardsRepository {
 
     constructor(private readonly prisma: PrismaService) { }
 
-    createCreditCard(title: string, cryptCvv: string, cryptPassword: string, number: string, expirationDate: string, isVirtual: boolean, nameOnCard: string, type: string, userId: number) {
+    createCreditCard(card: CreateCardDto, userId: number) {
+        const creditCardData = {
+            userId,
+            ...card
+        };
+
         return this.prisma.creditCard.create({
-            data: {
-                password: cryptPassword,
-                cvv: cryptCvv,
-                expirationDate,
-                isVirtual,
-                nameOnCard,
-                number,
-                title,
-                type,
-                userId
-            }
-        })
+            data: creditCardData
+        });
     }
 
     findAll(userId: number) {

@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { EQUALS, Equals, IsBoolean, IsDateString, IsNotEmpty, IsNumber, IsNumberString, IsString, Length, equals } from "class-validator";
+import { IsBoolean, IsDateString, IsNotEmpty, IsString, Length } from "class-validator";
 
 export class CreateCardDto {
 
