@@ -10,9 +10,9 @@ services:
       - driven-pass-network
     volumes:
       - pg-volumes:/var/lib/postgresql/data
-  driven-pass:
+  node:
     build: .
-    container_name: driven-pass
+    container_name: node
     ports:
       - 3000:3000
     env_file:
