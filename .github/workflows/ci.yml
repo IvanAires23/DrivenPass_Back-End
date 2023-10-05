@@ -1,5 +1,8 @@
 name: Push Request on GitHub
-on: [push]
+on: 
+    push:
+        branches:
+            main
 jobs:
     Push-GitHub:
         runs-on: ubuntu-latest
