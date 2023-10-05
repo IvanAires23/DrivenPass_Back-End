@@ -1,0 +1,27 @@
+services:
+  postgres:
+    image: postgres
+    container_name: postgres
+    ports:
+      - 5433:5432
+    env_file:
+      - .env.test
+    networks:
+      - driven-pass-network
+    volumes:
+      - pg-volumes:/var/lib/postgresql/data
+  driven-pass:
+    build: .
+    container_name: driven-pass
+    ports:
+      - 3000:3000
+    env_file:
+      - .env.test
+    networks:
+      - driven-pass-network
+    depends_on:
+      - postgres
+networks:
+  driven-pass-network:
+volumes:
+  pg-volumes:
