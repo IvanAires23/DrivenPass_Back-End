@@ -2,7 +2,7 @@ name: Push Request on GitHub
 on: 
     push:
         branches:
-            main
+           - main
 jobs:
     Push-GitHub:
         runs-on: ubuntu-latest
